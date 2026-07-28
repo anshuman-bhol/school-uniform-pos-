@@ -6,41 +6,123 @@ const updateStock = require("../utils/updateStock");
 
 const createReturn = async (req, res, next) => {
 
-    const lastReturn = await ReturnExchange.findOne()
-        .sort({ createdAt: -1 });
-
-    let returnNumber = "RET000001";
-
-    if (lastReturn?.returnNumber) {
-
-        const lastNumber = parseInt(
-            lastReturn.returnNumber.replace("RET", ""),
-            10
-        );
-
-        returnNumber =
-            `RET${String(lastNumber + 1).padStart(6, "0")}`;
-
-    }
-
     try {
+
+        // --------------------------------------------------
+        // Generate Return Number
+        // --------------------------------------------------
+
+        const lastReturn = await ReturnExchange.findOne({
+            type: "Return",
+            returnNumber: /^RET/
+        }).sort({ createdAt: -1 });
+
+        let returnNumber = "RET000001";
+
+        if (lastReturn?.returnNumber) {
+
+            const lastNumber = Number(
+                lastReturn.returnNumber.replace("RET", "")
+            );
+
+            if (!Number.isNaN(lastNumber)) {
+
+                returnNumber =
+                    `RET${String(lastNumber + 1).padStart(6, "0")}`;
+
+            }
+
+        }
+
+        // --------------------------------------------------
+        // Request Body
+        // --------------------------------------------------
+
         const {
             orderId,
             returnedItems,
             refund,
             reason,
         } = req.body;
+
+        // --------------------------------------------------
+        // Fetch Order
+        // --------------------------------------------------
+
         const order = await Order.findById(orderId);
-        let calculatedRefund = 0;
+
         if (!order) {
+
             return next(
                 createHttpError(
                     404,
-                    "Order not found"
+                    "Order not found."
                 )
             );
+
         }
+
+        if (
+            !returnedItems ||
+            returnedItems.length === 0
+        ) {
+
+            return next(
+                createHttpError(
+                    400,
+                    "No items selected for return."
+                )
+            );
+
+        }
+
+        // --------------------------------------------------
+        // Validate Refund Split
+        // --------------------------------------------------
+
+        if (
+            Number(refund.cash || 0) +
+            Number(refund.upi || 0) !==
+            Number(refund.total || 0)
+        ) {
+
+            return next(
+                createHttpError(
+                    400,
+                    "Invalid refund amount."
+                )
+            );
+
+        }
+
+        // --------------------------------------------------
+        // Validate Paid Amount
+        // --------------------------------------------------
+
+        if (
+            Number(refund.total) >
+            Number(order.paymentData.advancePaid)
+        ) {
+
+            return next(
+                createHttpError(
+                    400,
+                    "Refund cannot exceed amount paid."
+                )
+            );
+
+        }
+
+        // --------------------------------------------------
+        // Validate Items
+        // --------------------------------------------------
+
+        let calculatedRefund = 0;
+
+        const formattedReturnedItems = [];
+
         for (const returnItem of returnedItems) {
+
             const orderItem =
                 order.items.find(
                     item =>
@@ -49,39 +131,82 @@ const createReturn = async (req, res, next) => {
                         item.size === returnItem.size &&
                         item.colour === returnItem.colour
                 );
+
             if (!orderItem) {
+
                 return next(
                     createHttpError(
                         400,
-                        `${returnItem.name} not found in order`
+                        `${returnItem.name} not found in order.`
                     )
                 );
+
             }
-            const availableReturn = orderItem.quantity
+
             if (
                 returnItem.quantity >
-                availableReturn
+                orderItem.quantity
             ) {
 
                 return next(
                     createHttpError(
                         400,
-                        `Cannot return more than purchased quantity for ${returnItem.name}`
+                        `Cannot return more than purchased quantity for ${orderItem.name}.`
                     )
                 );
-            }
-            calculatedRefund +=
-                orderItem.pricePerQuantity * returnItem.quantity;
-            orderItem.returnedQuantity += returnItem.quantity;
-            // Reduce quantity in the order
-            orderItem.quantity -= returnItem.quantity;
 
-            // Recalculate item amount
-            orderItem.price = orderItem.quantity * orderItem.pricePerQuantity;
+            }
+
+            calculatedRefund +=
+                orderItem.pricePerQuantity *
+                returnItem.quantity;
+
+            formattedReturnedItems.push({
+
+                itemId: orderItem.itemId,
+
+                name: orderItem.name,
+
+                itemType: orderItem.itemType,
+
+                school: orderItem.school,
+
+                size: orderItem.size,
+
+                colour: orderItem.colour,
+
+                quantity: returnItem.quantity,
+
+                pricePerQuantity:
+                    orderItem.pricePerQuantity,
+
+                amount:
+                    orderItem.pricePerQuantity *
+                    returnItem.quantity,
+
+            });
+
+            // Update order item
+
+            orderItem.returnedQuantity +=
+                returnItem.quantity;
+
+            orderItem.quantity -=
+                returnItem.quantity;
+
+            orderItem.price =
+                orderItem.quantity *
+                orderItem.pricePerQuantity;
+
         }
 
+        // --------------------------------------------------
+        // Validate Refund Amount
+        // --------------------------------------------------
+
         if (
-            refund.total !== calculatedRefund
+            Number(refund.total) !==
+            Number(calculatedRefund)
         ) {
 
             return next(
@@ -92,11 +217,11 @@ const createReturn = async (req, res, next) => {
             );
 
         }
+        // --------------------------------------------------
+        // Restore Stock
+        // --------------------------------------------------
 
-        /*
-            Restore stock
-        */
-        for (const item of returnedItems) {
+        for (const item of formattedReturnedItems) {
 
             await updateStock({
 
@@ -115,68 +240,77 @@ const createReturn = async (req, res, next) => {
             });
 
         }
-        /*
-            Add negative cash ledger entry
-        */
+
+        // --------------------------------------------------
+        // Payment History
+        // --------------------------------------------------
+
         order.paymentHistory.push({
-            cashAmount:
-                -refund.cash || 0,
-            upiAmount:
-                -refund.upi || 0,
-            totalAmount:
-                -refund.total || 0,
-            receivedBy:
-                req.user?._id,
+
+            cashAmount: -(refund.cash || 0),
+
+            upiAmount: -(refund.upi || 0),
+
+            totalAmount: -(refund.total || 0),
+
+            receivedBy: req.user?._id,
+
         });
-        if (refund.cash + refund.upi !== refund.total) {
-            return next(
-                createHttpError(
-                    400,
-                    "Invalid refund amount."
-                )
-            );
-        }
 
-        // Refund cannot exceed amount already paid
-        if (refund.total > order.paymentData.advancePaid) {
-            return next(
-                createHttpError(
-                    400,
-                    "Refund cannot exceed the amount paid by the customer."
-                )
-            );
-        }
+        // --------------------------------------------------
+        // Remove Fully Returned Items
+        // --------------------------------------------------
 
-        // Remove items with zero quantity (optional)
-        order.items = order.items.filter(item => item.quantity > 0);
+        order.items = order.items.filter(
+            item => item.quantity > 0
+        );
 
-        // Recalculate subtotal
+        // --------------------------------------------------
+        // Recalculate Bill
+        // --------------------------------------------------
+
         const subtotal = order.items.reduce((sum, item) => {
-            item.price = item.pricePerQuantity * item.quantity;
+
+            item.price =
+                item.pricePerQuantity *
+                item.quantity;
+
             return sum + item.price;
+
         }, 0);
 
         order.bills.total = subtotal;
 
-        // GST
-        order.bills.tax = +(subtotal * 0.00).toFixed(2); // use your GST if applicable
+        order.bills.tax =
+            +(subtotal * 0).toFixed(2);
 
         order.bills.totalWithTax =
-            +(order.bills.total + order.bills.tax).toFixed(2);
+            +(order.bills.total +
+                order.bills.tax).toFixed(2);
 
+        // --------------------------------------------------
         // Discount
+        // --------------------------------------------------
+
         let discountAmount = 0;
 
-        if (order.bills.discount?.type === "percentage") {
+        if (
+            order.bills.discount?.type ===
+            "percentage"
+        ) {
 
             discountAmount =
-                +(order.bills.totalWithTax *
+                +(
+                    order.bills.totalWithTax *
                     order.bills.discount.value /
-                    100).toFixed(2);
+                    100
+                ).toFixed(2);
 
-            order.bills.discount.amount = discountAmount;
+            order.bills.discount.amount =
+                discountAmount;
 
-        } else {
+        }
+        else {
 
             discountAmount =
                 order.bills.discount?.amount || 0;
@@ -186,69 +320,90 @@ const createReturn = async (req, res, next) => {
         order.bills.finalAmount =
             Math.max(
                 0,
-                +(order.bills.totalWithTax - discountAmount).toFixed(2)
+                +(
+                    order.bills.totalWithTax -
+                    discountAmount
+                ).toFixed(2)
             );
 
-        // Reduce amount paid
-        order.paymentData.advancePaid -= refund.total;
+        // --------------------------------------------------
+        // Payment Data
+        // --------------------------------------------------
 
-        // Recalculate remaining amount
+        order.paymentData.advancePaid =
+            Math.max(
+                0,
+                order.paymentData.advancePaid -
+                refund.total
+            );
+
         order.paymentData.remainingAmount =
-            order.bills.finalAmount -
-            order.paymentData.advancePaid;
+            Math.max(
+                0,
+                +(
+                    order.bills.finalAmount -
+                    order.paymentData.advancePaid
+                ).toFixed(2)
+            );
 
-        // Update payment status
         order.paymentStatus =
-            order.paymentData.remainingAmount === 0
+            order.paymentData.remainingAmount <= 0
                 ? "Paid"
                 : "Pending";
+
+        // --------------------------------------------------
+        // Save Order
+        // --------------------------------------------------
 
         order.markModified("items");
         order.markModified("bills");
         order.markModified("paymentData");
 
-        console.log(
-            order.items.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                returnedQuantity: item.returnedQuantity,
-            }))
-        );
-
         await order.save();
-
-        const savedOrder = await Order.findById(order._id);
+        // --------------------------------------------------
+        // Save Return Record
+        // --------------------------------------------------
 
         const returnRecord =
             await ReturnExchange.create({
 
                 order: order._id,
 
-                invoiceNumber: order.invoiceNumber,
+                invoiceNumber:
+                    order.invoiceNumber,
 
                 returnNumber,
 
-                customerName: order.customerDetails.name,
+                customerName:
+                    order.customerDetails.name,
 
-                customerPhone: order.customerDetails.phone,
+                customerPhone:
+                    order.customerDetails.phone,
 
                 type: "Return",
 
-                returnedItems,
+                returnedItems:
+                    formattedReturnedItems,
 
                 refund,
 
                 reason,
 
-                handledBy: req.user?._id,
+                handledBy:
+                    req.user?._id,
 
             });
+
         res.status(201).json({
+
             success: true,
+
             message:
-                "Return processed successfully",
+                "Return processed successfully.",
+
             data:
                 returnRecord,
+
         });
     }
     catch (error) {
