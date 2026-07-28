@@ -11,7 +11,7 @@ const PORT = config.port;
 connectDB();
 app.use(cors({
     credentials:true,
-    origin: ['http://localhost:7667']
+    origin: ['http://localhost:5173']
 }))
 app.use(express.json());
 app.use(cookieParser());
