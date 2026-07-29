@@ -12,7 +12,7 @@ connectDB();
 app.use(cors({
     credentials:true,
     origin: ['http://localhost:5173',
-        "https://school-uniform-pos-bo7w.vercel.app"
+        "https://school-uniform-pos.vercel.app"
     ]
 }))
 app.use(express.json());
