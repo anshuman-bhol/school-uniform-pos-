@@ -193,11 +193,19 @@ const getUserData = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        res.clearCookie('accessToken')
-        res.status(200).json({ success: true, message: "User Logout successfully!" })
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "User Logout successfully!"
+        });
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
 
 module.exports = { register, login, sendOtp, verifyOtp, getUserData, logout }
