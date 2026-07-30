@@ -1,5 +1,5 @@
-import { BrowserRouter as Router,Routes,Route, useLocation } from "react-router-dom"
-import {Home, Auth, Orders, Tailors, Products} from "./pages"
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
+import { Home, Auth, Orders, Tailors, Products } from "./pages"
 import Header from "./components/shared/Header.jsx"
 import { useSelector } from "react-redux"
 import { Navigate } from "react-router-dom"
@@ -9,23 +9,24 @@ import Dashboard from "./pages/Dashboard.jsx"
 import More from "./pages/More.jsx"
 import UserApprovals from "./pages/UserApprovals.jsx"
 
-function Layout(){
+function Layout() {
   const location = useLocation()
-  const isLoading= useLoadData()
+  const isLoading = useLoadData()
   const hideHeaderRoutes = ["/auth"]
   const { isAuth } = useSelector(state => state.user)
 
-  if(isLoading) return <FullScreenLoader/>
+  if (isLoading) return <FullScreenLoader />
   return (
-    <div className="min-h-screen bg-[#252323]">
-        {!hideHeaderRoutes.includes(location.pathname) && <Header />}
+    <div className="h-screen bg-[#252323] flex flex-col overflow-hidden">
+      {!hideHeaderRoutes.includes(location.pathname) && <Header />}
+      <main className="flex-1 overflow-hidden">
         <Routes>
           <Route path="/" element={
             <ProtectedRoutes>
               <Home />
             </ProtectedRoutes>
-            } />
-          <Route path="/auth" element={isAuth ? <Navigate to="/" /> : <Auth/>} />
+          } />
+          <Route path="/auth" element={isAuth ? <Navigate to="/" /> : <Auth />} />
           <Route path="/orders" element={
             <ProtectedRoutes>
               <Orders />
@@ -38,7 +39,7 @@ function Layout(){
           } />
           <Route path="/products" element={
             <ProtectedRoutes>
-              <Products/>
+              <Products />
             </ProtectedRoutes>
           } />
           <Route path="/dashboard" element={
@@ -53,27 +54,28 @@ function Layout(){
           } />
           <Route path="/user-approvals" element={
             <ProtectedRoutes>
-              <UserApprovals  />
+              <UserApprovals />
             </ProtectedRoutes>
           } />
           <Route path="/8" element={<div>NotFound</div>} />
         </Routes>
+      </main>
     </div>
   )
 }
 
-function ProtectedRoutes({children}){
-  const {isAuth} = useSelector (state =>state.user)
-  if(!isAuth){
-    return <Navigate to="/auth"/>
+function ProtectedRoutes({ children }) {
+  const { isAuth } = useSelector(state => state.user)
+  if (!isAuth) {
+    return <Navigate to="/auth" />
   }
   return children
 }
 
 function App() {
-  return(
+  return (
     <Router>
-      <Layout/>
+      <Layout />
     </Router>
   )
 }

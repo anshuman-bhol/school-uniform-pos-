@@ -57,8 +57,8 @@ const StockHistoryTable = () => {
     }
 
     return (
-        <div className="bg-[#1a1a1a] rounded-xl h-115 overflow-y-scroll scrollbar-none">
-            <div className="flex justify-between items-center p-4">
+        <div className="bg-[#1a1a1a] rounded-xl flex flex-col h-full overflow-hidden">
+            <div className="flex justify-between items-center p-4 shrink-0">
                 <input
                     type="text"
                     value={search}
@@ -77,54 +77,60 @@ const StockHistoryTable = () => {
                     <option>This Month</option>
                 </select>
             </div>
-            <table className="w-full">
-                <thead className="bg-[#202020] sticky top-0">
-                    <tr>
-                        <th className="p-4 text-left text-gray-300">Date</th>
-                        <th className="p-4 text-left text-gray-300">School</th>
-                        <th className="p-4 text-left text-gray-300">Product</th>
-                        <th className="p-4 text-left text-gray-300">Size</th>
-                        <th className="p-4 text-left text-gray-300">Colour</th>
-                        <th className="p-4 text-left text-gray-300">Operation</th>
-                        <th className="p-4 text-left text-gray-300">Previous</th>
-                        <th className="p-4 text-left text-gray-300">Quantity</th>
-                        <th className="p-4 text-left text-gray-300">New</th>
-                    </tr>
-                </thead>
-                <tbody>
-                   {filteredHistory.map((row) => (
-                        <tr
-                            key={row._id}
-                            className="border-b border-[#2d2d2d]"
-                        >
-                            <td className="p-4 text-gray-400 font-medium">
-                                {new Date(
-                                    row.createdAt
-                                ).toLocaleString()}
-                            </td>
-                            <td className="p-4 text-white"> {row.productName} </td>
-                            <td className="p-4 text-white"> {row.school} </td>
-                            <td className="p-4 text-white"> {row.size} </td>
-                            <td className="p-4 text-white"> {row.colour} </td>
-                            <td className="p-4">
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${row.operation === "add"
-                                        ? "bg-green-900 text-green-300"
-                                        : "bg-blue-900 text-blue-300"
-                                        }`}
-                                >
-                                    {row.operation === "add"
-                                        ? "Receive"
-                                        : "Set"}
-                                </span>
-                            </td>
-                            <td className="p-4 text-white"> {row.previousStock} </td>
-                            <td className="p-4 text-green-400"> {row.quantity} </td>
-                            <td className="p-4 text-yellow-400"> {row.newStock} </td>
+            <div className="flex-1 overflow-y-auto scrollbar-none">
+                <table className="w-full">
+                    <thead className="bg-[#202020] sticky top-0">
+                        <tr>
+                            <th className="p-4 text-left text-gray-300">Date</th>
+                            <th className="p-4 text-left text-gray-300">School</th>
+                            <th className="p-4 text-left text-gray-300">Product</th>
+                            <th className="p-4 text-left text-gray-300">Size</th>
+                            <th className="p-4 text-left text-gray-300">Colour</th>
+                            <th className="p-4 text-left text-gray-300">Operation</th>
+                            <th className="p-4 text-left text-gray-300">Previous</th>
+                            <th className="p-4 text-left text-gray-300">Quantity</th>
+                            <th className="p-4 text-left text-gray-300">New</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filteredHistory.map((row) => (
+                            <tr
+                                key={row._id}
+                                className="border-b border-[#2d2d2d]"
+                            >
+                                <td className="p-4 text-gray-400 font-medium">
+                                    {new Date(row.createdAt).toLocaleString("en-IN", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </td>
+                                <td className="p-4 text-white">{row.school}</td>
+                                <td className="p-4 text-white">{row.productName}</td>
+                                <td className="p-4 text-white"> {row.size} </td>
+                                <td className="p-4 text-white"> {row.colour} </td>
+                                <td className="p-4">
+                                    <span
+                                        className={`px-3 py-1 rounded-full text-sm font-semibold ${row.operation === "add"
+                                            ? "bg-green-900 text-green-300"
+                                            : "bg-blue-900 text-blue-300"
+                                            }`}
+                                    >
+                                        {row.operation === "add"
+                                            ? "Receive"
+                                            : "Set"}
+                                    </span>
+                                </td>
+                                <td className="p-4 text-white"> {row.previousStock} </td>
+                                <td className="p-4 text-green-400"> {row.quantity} </td>
+                                <td className="p-4 text-yellow-400"> {row.newStock} </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

@@ -93,14 +93,14 @@ const OrderCard = ({ order }) => {
             <p className="text-[#ababab] text-sm">Invoice : {order.invoiceNumber}</p>
             <p className="text-[#ababab] text-sm">Delivery :{" "} {formatDateAndTime(order.customerDetails.deliveryDate)}</p>
           </div>
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-end gap-3 font-medium">
             {hasReadyMade && renderStatus(readyMadeStatus, "Ready-made")}
             {hasReadyMade && hasTailoring && (<hr className="w-full border-gray-600" />)}
             {hasTailoring && renderStatus(tailoringStatus, "Tailoring")}
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center mt-4 text-[#ababab]">
+      <div className="flex justify-between items-center mt-4 text-[#ababab] font-light">
         <p>{formatDateAndTime(order.completedAt || order.orderDate)}</p>
         <p>{order.items.length} Items</p>
         <p className={order.paymentStatus === "Paid"

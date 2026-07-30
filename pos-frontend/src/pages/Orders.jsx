@@ -77,13 +77,13 @@ const Orders = () => {
   }
 
   return (
-    <section className='bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-hidden'>
-      <div className="flex items-center justify-between px-10 py-4">
+    <section className="bg-[#1f1f1f] h-full overflow-hidden flex flex-col relative">
+      <div className="flex items-center justify-between px-10 py-4 shrink-0">
         <div className="flex items-center gap-4">
           <BackButton />
           <h1 className="text-[#f5f5f5] text-xl font-bold tracking-wide">Orders</h1>
         </div>
-        <div className="flex items-center justify-around gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={() => setStatus("all")}
             className={`text-[#ababab] text-lg ${status === "all" && "bg-[#383838]"
@@ -133,23 +133,30 @@ const Orders = () => {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap gap-6 h-120 items-center justify-center px-10 py-4 overflow-y-scroll scrollbar-none">
-        {
-          filteredOrders?.length > 0 ? (
-            filteredOrders.map((order) => {
-              return (
-                <OrderCard
-                  key={order._id}
-                  order={order}
-                />
-              )
-            })
-          ) : (
-            <p className="col-span-3 text-2xl text-gray-200">
-              No Orders available
-            </p>
-          )
-        }
+      <div className="flex-1 min-h-0 px-10 py-4 mb-20 overflow-y-auto scrollbar-none">
+        <div
+          className={`flex flex-wrap gap-6 justify-center ${filteredOrders.length <= 3 ? "content-center h-full" : "content-start"
+            }`}
+        >
+          {
+            filteredOrders?.length > 0 ? (
+              filteredOrders.map((order) => {
+                return (
+                  <OrderCard
+                    key={order._id}
+                    order={order}
+                  />
+                )
+              })
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <p className="text-2xl text-gray-200 font-medium">
+                  No Orders Available
+                </p>
+              </div>
+            )
+          }
+        </div>
       </div>
       <BottomNav />
     </section>

@@ -71,21 +71,21 @@ const InventoryTable = () => {
     const lowStock = rows.filter(p => p.stock > 0 && p.stock <= 5).length;
     const outStock = rows.filter(p => p.stock === 0).length;
     return (
-        <div className="bg-[#1a1a1a] rounded-xl overflow-hidden text-center flex flex-col">
+        <div className="bg-[#1a1a1a] rounded-xl overflow-hidden text-center flex flex-col h-full">
 
-            <div className="grid grid-cols-4 gap-4 mb-6 font-medium">
+            <div className="grid grid-cols-4 gap-4 mb-6 font-medium shrink-0">
                 <SummaryCard title="Products" value={totalProducts} />
                 <SummaryCard title="Available" value={available} />
                 <SummaryCard title="Low Stock" value={lowStock} />
                 <SummaryCard title="Out of Stock" value={outStock} />
             </div>
 
-            <div className="flex justify-between items-center mb-5 px-10">
+            <div className="flex justify-between items-center mb-5 px-10 shrink-0">
                 <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search Product"
-                    className="bg-[#202020] text-white rounded-lg px-5 py-3 w-96 outline-none"
+                    className="bg-[#202020] text-white rounded-lg px-5 py-3 w-96 max-w-full outline-none"
                 />
 
                 <select
@@ -104,10 +104,10 @@ const InventoryTable = () => {
             </div>
 
             {/* Scrollable Table */}
-            <div className="h-65 overflow-y-scroll scrollbar-none px-2">
+            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none px-2 pb-4">
 
                 <table className="w-full">
-                    <thead className="sticky top-0 bg-[#202020] ">
+                    <thead className="sticky top-0 z-10 bg-[#202020]">
                         <tr className="text-center">
                             <th className="p-4 text-gray-300">Category</th>
                             <th className="p-4 text-gray-300">Product</th>
@@ -121,62 +121,73 @@ const InventoryTable = () => {
                     </thead>
 
                     <tbody>
-                        {rows.map((item) => (
-                            <tr
-                                key={item._id}
-                                className={`border-b border-[#2b2b2b] font-light text-center hover:bg-[#232323]
+                        {rows.length > 0 ? (
+                            rows.map((item) => (
+                                <tr
+                                    key={item._id}
+                                    className={`border-b border-[#2b2b2b] font-light text-center hover:bg-[#232323]
                                 ${item.stock === 0
-                                        ? "bg-red-950/30"
-                                        : item.stock <= 5
-                                            ? "bg-yellow-950/20"
-                                            : ""
-                                    }`}
-                            >
-                                <td className="p-4 text-white">
-                                    {item.category}
-                                </td>
-                                <td className="p-4 text-white">
-                                    {item.name}
-                                </td>
-                                <td className="p-4 text-white">
-                                    {item.school}
-                                </td>
-                                <td className="p-4 text-white">
-                                    {item.size}
-                                </td>
-                                <td className="p-4 text-white">
-                                    {item.color}
-                                </td>
-                                <td
-                                    className={`p-4 font-semibold ${item.stock === 0
+                                            ? "bg-red-950/30"
+                                            : item.stock <= 5
+                                                ? "bg-yellow-950/20"
+                                                : ""
+                                        }`}
+                                >
+                                    <td className="p-4 text-white">
+                                        {item.category}
+                                    </td>
+                                    <td className="p-4 text-white">
+                                        {item.name}
+                                    </td>
+                                    <td className="p-4 text-white">
+                                        {item.school}
+                                    </td>
+                                    <td className="p-4 text-white">
+                                        {item.size}
+                                    </td>
+                                    <td className="p-4 text-white">
+                                        {item.color}
+                                    </td>
+                                    <td
+                                        className={`p-4 font-semibold ${item.stock === 0
                                             ? "text-red-400"
                                             : item.stock <= 5
                                                 ? "text-yellow-400"
                                                 : "text-green-400"
-                                        }`}
+                                            }`}
+                                    >
+                                        {item.stock}
+                                    </td>
+                                    <td className="p-4 text-green-400 font-semibold">
+                                        ₹{item.sellingPrice || 0}
+                                    </td>
+                                    <td className="p-4">
+                                        {item.stock === 0 ? (
+                                            <span className="bg-red-900 text-red-300 px-3 py-1 rounded-full text-sm">
+                                                Out of Stock
+                                            </span>
+                                        ) : item.stock <= 5 ? (
+                                            <span className="bg-yellow-900 text-yellow-300 px-3 py-1 rounded-full text-sm">
+                                                Low Stock
+                                            </span>
+                                        ) : (
+                                            <span className="bg-green-900 text-green-300 px-3 py-1 rounded-full text-sm">
+                                                Available
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr className="h-16 border-b border-[#2b2b2b] font-light text-center hover:bg-[#232323]">
+                                <td
+                                    colSpan={8}
+                                    className="h-72 text-center text-gray-400 text-lg"
                                 >
-                                    {item.stock}
-                                </td>
-                                <td className="p-4 text-green-400 font-semibold">
-                                    ₹{item.sellingPrice || 0}
-                                </td>
-                                <td className="p-4">
-                                    {item.stock === 0 ? (
-                                        <span className="bg-red-900 text-red-300 px-3 py-1 rounded-full text-sm">
-                                            Out of Stock
-                                        </span>
-                                    ) : item.stock <= 5 ? (
-                                        <span className="bg-yellow-900 text-yellow-300 px-3 py-1 rounded-full text-sm">
-                                            Low Stock
-                                        </span>
-                                    ) : (
-                                        <span className="bg-green-900 text-green-300 px-3 py-1 rounded-full text-sm">
-                                            Available
-                                        </span>
-                                    )}
+                                    No Products Found
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
 

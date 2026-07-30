@@ -30,7 +30,7 @@ const Header = () => {
     }
 
     return (
-        <header className='flex justify-between items-center px-8 py-2 bg-black'>
+        <header className="h-16 flex items-center justify-between px-8 bg-black shrink-0">
             <div onClick={() => navigate("/")} className='flex items-center gap-2 cursor-pointer'>
                 <img src={logo} className="h-8 w-8 " alt="restro logo" />
                 <h1 className='text-lg font-semibold text-white'>Clothing</h1>

@@ -197,8 +197,8 @@ const Bill = () => {
   };
 
   return (
-    <>
-      <div className="max-h-60 overflow-y-auto px-5 mt-2">
+    <div className="shrink-0">
+      <div className="max-h-40 overflow-y-auto px-5 mt-2 scrollbar-none">
 
         {editableCart
           .filter(item => item.customPrice)
@@ -270,10 +270,10 @@ const Bill = () => {
         <h1 className="text-[#f5f5f5] font-bold">₹ {total.toFixed(2)}</h1>
       </div>
 
-      <div className="flex items-center justify-between px-5 mt-2">
+      {/* <div className="flex items-center justify-between px-5 mt-2">
         <p className="text-xs text-[#ababab] font-medium">GST (0.00%)</p>
         <h1 className="text-[#f5f5f5] font-bold">₹ {tax.toFixed(2)}</h1>
-      </div>
+      </div> */}
 
       <div className="flex items-center justify-between px-5 mt-2">
         <p className="text-xs text-[#ababab] font-medium">Total</p>
@@ -295,7 +295,7 @@ const Bill = () => {
       >Tailoring item prices will be entered during billing.</p>
 
       {/* Payment Method */}
-      <div className="px-5 mt-2">
+      <div className="px-5 mt-1">
         <button disabled={total <= 0 || tailoringPricePending} onClick={() => setShowPaymentModal(true)}
           className={`w-full py-3 rounded-lg font-semibold transition
             ${paymentInfo.paymentStatus === "Paid"
@@ -334,7 +334,7 @@ const Bill = () => {
             handleCreateOrder()
           }}
           className={`
-      w-full py-3 rounded-lg font-bold transition
+      w-full py-3 mb-2 rounded-lg font-bold transition
       ${hasAdvancePayment && total > 0
               ? "bg-yellow-500 text-black"
               : "bg-[#4b4b4b] text-gray-400"
@@ -480,7 +480,7 @@ const Bill = () => {
           }}
         />
       )}
-    </>
+    </div>
   );
 
 };

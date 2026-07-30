@@ -94,8 +94,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-[#252323] h-[calc(100vh-80px)] flex flex-col ">
-      <div className="container mx-auto flex items-center justify-between py-8 px-4">
+    <div className="bg-[#252323] h-[calc(100vh-5rem)] flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 shrink-0">
 
         {/* Left Buttons */}
         <div className="flex items-center gap-3">
@@ -145,11 +145,23 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        {activeTab === "Orders" && <RecentOrders />}
-        {activeTab === "Inventory" && <Inventory />}
+      <div className="flex-1 min-h-0 overflow-hidden px-4 pb-4">
+        {activeTab === "Orders" && (
+          <div className="h-full">
+            <RecentOrders />
+          </div>
+        )}
+
+        {activeTab === "Inventory" && (
+          <div className="h-full">
+            <Inventory />
+          </div>
+        )}
+
         {activeTab === "Transactions" && (
-          <PaymentLedger />
+          <div className="h-full">
+            <PaymentLedger />
+          </div>
         )}
       </div>
 

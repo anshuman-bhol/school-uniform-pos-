@@ -10,8 +10,8 @@ const Auth = () => {
   const [loginMode, setLoginMode] = useState("password");
 
   return (
-    <div className=" flex max-h-screen w-full">
-      <div className=" w-1/2 flex items-center justify-center bg-cover">
+    <div className="flex flex-col lg:flex-row w-screen h-screen overflow-hidden">
+      <div className="hidden lg:block relative lg:w-1/2 h-full">
         <img className='w-full h-full object-cover brightness-50' src={sec} alt="authenticate" />
         <blockquote className='absolute bottom-10 px-8 mb-10 text-white font-medium text-2xl italic'>
           "Simplifying Business, One Solution at a Time."
@@ -19,9 +19,9 @@ const Auth = () => {
           <span className='block mt-4 text-yellow-400'>Founder of Clothing</span>
         </blockquote>
       </div>
-      <div className='w-1/2 min-h-screen bg-[#1a1a1a] px-15 py-10'>
+      <div className='w-full lg:w-1/2 h-full bg-[#1a1a1a] px-6 sm:px-8 lg:px-12 py-8 overflow-y-auto'>
         <div className='flex flex-col items-center gap-2 pb-3'>
-          <img src={logo} alt="Restro Logo" className='w-130 border-2 rounded-lg p-2' />
+          <img src={logo} alt="Restro Logo" className='w-104 border-2 rounded-lg p-2' />
         </div>
         <h2 className='text-4xl text-center mt-2 font-semibold text-yellow-400 mb-4'>
           Employee {isRegister ? " Registration" : " Login"}

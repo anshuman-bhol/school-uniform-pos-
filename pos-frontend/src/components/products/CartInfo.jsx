@@ -21,15 +21,19 @@ const CartInfo = () => {
     }
 
     return (
-        <div className='px-4 py-2'>
+        <div className="px-4 py-2 flex flex-col flex-1 min-h-0">
             <h1 className='text-lg text-[#e4e4e4] font-semibold tracking-wide'>Products</h1>
-            <div className='mt-4 overflow-y-scroll scrollbar-none h-36' ref={scrollRef}>
+            <div ref={scrollRef} className="mt-4 flex-1 min-h-0 overflow-y-auto scrollbar-none">
                 {
                     cartData.length === 0 ? (
-                        <p className="text-[#ababab] text-lg font-bold flex justify-center items-center h-36">No products added yet??</p>
+                        <div className="h-full flex items-center justify-center">
+                            <p className="text-[#ababab] text-lg font-bold text-center">
+                                No products added yet
+                            </p>
+                        </div>
                     ) : cartData.map((item) => {
                         return (
-                            <div className='bg-[#1f1f1f] rounded-lg px-4 py-4 mb-2'>
+                            <div key={item.id} className="bg-[#1f1f1f] rounded-lg px-4 py-4 mb-2">
                                 <div className='flex items-center justify-between'>
                                     <h1 className='text-[#ababab] font-semibold tracking-wide text-md'>{item.name}</h1>
                                     <p className='text-[#ababab] font-semibold'>x{item.quantity}</p>

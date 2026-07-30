@@ -115,13 +115,13 @@ const RecentOrders = () => {
 
   const orders = [...(resData?.data.data || [])];
   console.log(
-  "Orders:",
-  orders.map(o => ({
-    invoice: o.invoiceNumber,
-    finalAmount: o.bills.finalAmount,
-    totalWithTax: o.bills.totalWithTax,
-  }))
-);
+    "Orders:",
+    orders.map(o => ({
+      invoice: o.invoiceNumber,
+      finalAmount: o.bills.finalAmount,
+      totalWithTax: o.bills.totalWithTax,
+    }))
+  );
   const selectedOrder = orders.find(order => order._id === selectedOrderId) || null;
 
   const isToday = (date) => {
@@ -289,8 +289,7 @@ const RecentOrders = () => {
 
   return (
     <div className="px-16 mx-auto bg-[#262626] rounded-lg h-full flex flex-col">
-      <div className="grid grid-cols-6 gap-4 mt-5 mb-5 font-medium">
-
+      <div className="grid grid-cols-6 gap-4 mt-5 mb-5 font-medium shrink-0">
         <div onClick={() => setStatusFilter("All")}>
           <SummaryCard
             title="Active"
@@ -346,11 +345,11 @@ const RecentOrders = () => {
             placeholder="Search customer name/ phone / order"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-[#333] outline-none text-white px-2 py-1 rounded-[5px] w-75"
+            className="bg-[#333] outline-none text-white px-2 py-1 rounded-md flex-1 min-w-64"
           />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto scrollbar-none">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none pb-2 rounded-lg border border-[#3a3a3a]">
         <table className="w-full text-left text-[#f5f5f5] border-separate border-spacing-0">
           <thead className="sticky top-0 bg-[#333] text-[#ababab]">
             <tr>
@@ -365,105 +364,115 @@ const RecentOrders = () => {
             </tr>
           </thead>
           <tbody>
-            {displayOrders?.map((order) => {
-              const hasTailoring = order.items.some(
-                (item) => item.itemType === "Tailoring"
-              );
-              const hasReadyMade = order.items.some(
-                (item) => item.itemType === "ReadyMade"
-              );
+            {displayOrders.length > 0 ? (
+              displayOrders?.map((order) => {
+                const hasTailoring = order.items.some(
+                  (item) => item.itemType === "Tailoring"
+                );
+                const hasReadyMade = order.items.some(
+                  (item) => item.itemType === "ReadyMade"
+                );
 
-              const tailoringStatus =
-                order.orderStatus?.tailoring?.status;
+                const tailoringStatus =
+                  order.orderStatus?.tailoring?.status;
 
-              const readyMadeStatus =
-                order.orderStatus?.readyMade?.status;
+                const readyMadeStatus =
+                  order.orderStatus?.readyMade?.status;
 
-              return (
-                <tr
-                  key={order._id}
-                  className="border-b border-gray-600 hover:bg-[#47475236]"
-                >
-                  <td className="p-4">#{order.invoiceNumber}</td>
+                return (
+                  <tr
+                    key={order._id}
+                    className=" h-20 border-b border-gray-600 hover:bg-[#47475236]"
+                  >
+                    <td className="p-4">#{order.invoiceNumber}</td>
 
-                  <td className="p-4">
-                    {order.customerDetails.name}
-                  </td>
+                    <td className="p-4">
+                      {order.customerDetails.name}
+                    </td>
 
-                  <td className="p-4">
+                    <td className="p-4 font-medium">
 
-                    {hasReadyMade && (
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">
-                          Ready-made
-                        </p>
+                      {hasReadyMade && (
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">
+                            Ready-made
+                          </p>
 
-                        <div className={`rounded-lg border px-3 py-2 text-center font-medium ${getStatusColor("Delivered")}`}>
-                          Delivered
+                          <div className={`rounded-lg border px-3 py-2 text-center font-medium ${getStatusColor("Delivered")}`}>
+                            Delivered
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {hasTailoring && (
-                      <div className={hasReadyMade ? "mt-3" : ""}>
+                      {hasTailoring && (
+                        <div className={hasReadyMade ? "mt-3" : ""}>
 
-                        <p className="text-xs text-gray-400 mb-1">
-                          Tailoring
-                        </p>
+                          <p className="text-xs text-gray-400 mb-1">
+                            Tailoring
+                          </p>
 
-                        <TailoringStatusSelect
-                          order={order}
-                          tailoringStatus={tailoringStatus}
-                          getStatusColor={getStatusColor}
-                          onStatusChange={(status) =>
-                            handleStatusChange({
-                              orderId: order._id,
-                              currentStatus: tailoringStatus,
-                              orderStatus: status,
-                              workflow: "tailoring",
-                              order,
-                            })
-                          }
-                        />
+                          <TailoringStatusSelect
+                            order={order}
+                            tailoringStatus={tailoringStatus}
+                            getStatusColor={getStatusColor}
+                            onStatusChange={(status) =>
+                              handleStatusChange({
+                                orderId: order._id,
+                                currentStatus: tailoringStatus,
+                                orderStatus: status,
+                                workflow: "tailoring",
+                                order,
+                              })
+                            }
+                          />
 
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                  </td>
+                    </td>
 
-                  <td className="p-4">
-                    {formatDateAndTime(
-                      (hasTailoring
-                        ? tailoringStatus
-                        : readyMadeStatus) === "Delivered" && order.completedAt
-                        ? order.completedAt
-                        : order.orderDate
-                    )}
-                  </td>
+                    <td className="p-4">
+                      {formatDateAndTime(
+                        (hasTailoring
+                          ? tailoringStatus
+                          : readyMadeStatus) === "Delivered" && order.completedAt
+                          ? order.completedAt
+                          : order.orderDate
+                      )}
+                    </td>
 
-                  <td className="p-4">
-                    {order.items.length} Items
-                  </td>
+                    <td className="p-4">
+                      {order.items.length} Items
+                    </td>
 
-                  <td className="p-4">
-                    {order.tailor ? order.tailor.name : "-"}
-                  </td>
+                    <td className="p-4">
+                      {order.tailor ? order.tailor.name : "-"}
+                    </td>
 
-                  <td className="p-4">
-                    ₹{(order.bills.finalAmount ?? order.bills.totalWithTax).toFixed(2)}
-                  </td>
+                    <td className="p-4">
+                      ₹{(order.bills.finalAmount ?? order.bills.totalWithTax).toFixed(2)}
+                    </td>
 
-                  <td className="p-4 text-center">
-                    <button
-                      onClick={() => setSelectedOrderId(order._id)}
-                      className="text-blue-400 hover:text-blue-500 transition"
-                    >
-                      <FaPrint size={20} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                    <td className="p-4 text-center">
+                      <button
+                        onClick={() => setSelectedOrderId(order._id)}
+                        className="text-blue-400 hover:text-blue-500 transition"
+                      >
+                        <FaPrint size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })) : (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="h-72 text-center text-gray-400 text-lg"
+                >
+                  No Orders Available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         {selectedOrder && (

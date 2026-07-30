@@ -64,13 +64,13 @@ soldMap[key] = (soldMap[key] || 0) + item.quantity;
     .slice(0, 10);
 
     return (
-        <div className="mt-6 pr-6">
-            <div className="bg-[#1a1a1a] w-full rounded-lg">
+        <div className="h-full pt-4 pr-6">
+            <div className="bg-[#1a1a1a] w-full h-full rounded-lg flex flex-col">
                 <div className="flex justify-between items-center px-6 py-4">
                     <h1 className="text-[#f5f5f5] text-lg font-semibold tracking wide">Top Selling This Week</h1>
                     <span className="text-gray-400 text-sm font-medium">{topSelling.length} Products</span>
                 </div>
-                <div className="overflow-y-scroll h-126 pb-5 scrollbar-none">
+                <div className="flex-1 min-h-0 overflow-y-auto pb-4 scrollbar-none">
                     {
                         topSelling.map((item, index) => (
                             <div
