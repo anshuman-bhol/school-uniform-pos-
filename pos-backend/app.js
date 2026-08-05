@@ -2,8 +2,6 @@ const express = require("express");
 const connectDB=require("./config/database")
 const config = require("./config/config");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
-const adminRouter = require("./routes/adminRoutes");
-const { requireAuth, requireAdmin } = require("./middlewares/adminMiddleware");
 const createHttpError = require("http-errors");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -20,7 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/admin", requireAuth, requireAdmin, adminRouter);
+app.get("/admin", require("./routes/adminRoutes"));
 
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/user", require("./routes/userRoute"));
