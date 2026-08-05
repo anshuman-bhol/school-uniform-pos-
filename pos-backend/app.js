@@ -18,10 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req,res)=>{
-    const err=createHttpError(404, "something went wrong!");
-    res.json({message:"Hello from POS Server!"});
-})
+app.get("/", require("./routes/adminRoutes"));
 
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/user", require("./routes/userRoute"));
