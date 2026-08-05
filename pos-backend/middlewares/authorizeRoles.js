@@ -1,24 +1,18 @@
 const createHttpError = require("http-errors");
 
 const authorizeRoles = (...allowedRoles) => {
+    const normalizedAllowedRoles = allowedRoles.map((role) => role?.toLowerCase());
+
     return (req, res, next) => {
-        if (!req.user) {
-            return next(
-                createHttpError(
-                    401,
-                    "Please login first."
-                )
-            );
+        if (!req.user || typeof req.user !== "object") {
+            return next(createHttpError(401, "Authentication required"));
         }
 
-        console.log("Logged in role:", req.user.role);
-console.log("Allowed roles:", allowedRoles);
-        if (!allowedRoles.includes(req.user.role)) {
+        const userRole = req.user.role?.toLowerCase();
+
+        if (!normalizedAllowedRoles.includes(userRole)) {
             return next(
-                createHttpError(
-                    403,
-                    "You are not authorized to perform this action."
-                )
+                createHttpError(403, "Access denied. Insufficient permissions.")
             );
         }
 
