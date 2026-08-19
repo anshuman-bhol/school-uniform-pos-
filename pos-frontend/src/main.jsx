@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import store from './redux/store.js'
 import {SnackbarProvider} from "notistack"
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
+import { registerSW } from "virtual:pwa-register";
 
 const queryclient=new QueryClient({
   defaultOptions:{
@@ -14,6 +15,10 @@ const queryclient=new QueryClient({
     }
   }
 })
+
+registerSW({
+  immediate: true,
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

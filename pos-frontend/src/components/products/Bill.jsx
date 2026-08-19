@@ -82,7 +82,7 @@ const Bill = () => {
         queryKey: ["products"],
       });
       enqueueSnackbar(
-        variables.orderStatus === "Ready"
+        variables.orderStatus === "Delivered"
           ? "Ready-made order created!"
           : "Tailoring order created!",
         {
