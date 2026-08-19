@@ -25,12 +25,12 @@ export default defineConfig({
 
         icons: [
           {
-            src: "./src/assets/images/header.png",
+            src: "./public/header.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "./src/assets/images/loginlogo.png",
+            src: "./public/loginlogo.png",
             sizes: "512x512",
             type: "image/png",
           },
