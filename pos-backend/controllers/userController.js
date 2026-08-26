@@ -83,7 +83,8 @@ const login = async (req, res, next) => {
 
         res.status(200).json({
             success: true, message: "User login successfully",
-            data: isUserPresent
+            data: isUserPresent,
+            accessToken,
         })
 
     } catch (error) {
@@ -173,6 +174,7 @@ const verifyOtp = async (req, res, next) => {
             success: true,
             message: "Login successful!",
             data: user,
+            accessToken,
         });
 
     } catch (error) {

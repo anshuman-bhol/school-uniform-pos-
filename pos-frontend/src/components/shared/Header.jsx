@@ -6,7 +6,7 @@ import logo from "../../assets/images/header.png"
 import { useSelector, useDispatch } from "react-redux";
 import { useMutation } from "@tanstack/react-query";
 import { TbLogout } from "react-icons/tb";
-import { logout } from "../../https";
+import { ACCESS_TOKEN_KEY, logout } from "../../https";
 import { removeUser } from "../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 const Header = () => {
@@ -18,11 +18,15 @@ const Header = () => {
         mutationFn: () => logout(),
         onSuccess: (data) => {
             console.log(data)
+            localStorage.removeItem(ACCESS_TOKEN_KEY)
             dispatch(removeUser())
             navigate("/auth")
         },
         onError: (error) => {
             console.log(error)
+            localStorage.removeItem(ACCESS_TOKEN_KEY)
+            dispatch(removeUser())
+            navigate("/auth")
         }
     })
     const handleLogout = () => {

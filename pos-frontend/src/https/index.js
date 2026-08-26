@@ -1,4 +1,7 @@
 import axios from "axios"
+
+export const ACCESS_TOKEN_KEY = "accessToken";
+
 const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL,
     withCredentials: true,
@@ -7,6 +10,16 @@ const api = axios.create({
         Accept: "application/json"
     }
 })
+
+api.interceptors.request.use((config) => {
+    const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+    if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+});
 
 
 export const login = (data) => api.post("/api/user/login", data)

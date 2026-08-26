@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { login, sendOtp, verifyOtp } from "../../https/index"
+import { ACCESS_TOKEN_KEY, login, sendOtp, verifyOtp } from "../../https/index"
 import { useState } from "react"
 import { enqueueSnackbar } from "notistack"
 import { useDispatch } from "react-redux"
@@ -46,6 +46,7 @@ const Login = () => {
             const { data } = res
             console.log(data)
             const { _id, name, email, phone, role } = data.data
+            localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken)
             dispatch(setUser({ _id, name, email, phone, role }))
             navigate("/")
         },
@@ -81,6 +82,8 @@ const Login = () => {
 
         onSuccess: (res) => {
             const { _id, name, email, phone, role } = res.data.data;
+
+            localStorage.setItem(ACCESS_TOKEN_KEY, res.data.accessToken);
 
             dispatch(
                 setUser({
