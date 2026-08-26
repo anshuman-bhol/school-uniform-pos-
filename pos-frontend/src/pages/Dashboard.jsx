@@ -39,15 +39,11 @@ const Dashboard = () => {
     action: "upload",
   });
 
-  if (user.role === "admin") {
-    buttons.push(
-      {
-        label: "Download Template",
-        icon: <FiDownload />,
-        action: "template",
-      }
-    );
-  }
+  buttons.push({
+    label: "Download Template",
+    icon: <FiDownload />,
+    action: "template",
+  });
 
   const catalogueUploadRef = useRef(null);
   const mergeUploadRef = useRef(null);
