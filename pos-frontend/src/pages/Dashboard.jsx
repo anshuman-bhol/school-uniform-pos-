@@ -33,18 +33,14 @@ const Dashboard = () => {
 
   const buttons = [];
 
+  buttons.push({
+    label: "Upload Products",
+    icon: <PiUploadBold />,
+    action: "upload",
+  });
+
   if (user.role === "admin") {
     buttons.push(
-      // {
-      //   label: "Add Tailor",
-      //   icon: <MdTableBar />,
-      //   action: "tailor",
-      // },
-      {
-        label: "Upload Products",
-        icon: <PiUploadBold />,
-        action: "upload",
-      },
       {
         label: "Download Template",
         icon: <FiDownload />,
@@ -176,6 +172,7 @@ const Dashboard = () => {
       {
         showUploadOptions && (
           <UploadOptionsModal
+            isAdmin={user.role === "admin"}
             onClose={() =>
               setShowUploadOptions(false)
             }

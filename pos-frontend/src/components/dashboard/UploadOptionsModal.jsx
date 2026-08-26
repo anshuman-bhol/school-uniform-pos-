@@ -3,6 +3,7 @@ const UploadOptionsModal = ({
     onCatalogue,
     onMerge,
     onStock,
+    isAdmin,
 }) => {
 
     return (
@@ -14,13 +15,14 @@ const UploadOptionsModal = ({
                     Upload Data
                 </h2>
 
-                {/* Replace Catalogue */}
-                <button
-                    onClick={onCatalogue}
-                    className="w-full bg-[#025cca] text-white py-3 rounded-lg mb-4 hover:bg-[#014ca8]"
-                >
-                    New Catalogue
-                </button>
+                {isAdmin && (
+                    <button
+                        onClick={onCatalogue}
+                        className="w-full bg-[#025cca] text-white py-3 rounded-lg mb-4 hover:bg-[#014ca8]"
+                    >
+                        New Catalogue
+                    </button>
+                )}
 
                 {/* Merge Products */}
                 <button

@@ -50,11 +50,9 @@ const Header = () => {
             </div>
 
             <div className='flex items-center gap-4'>
-                {userData.role === "admin" && (
-                    <div onClick={() => navigate("/dashboard")} className='bg-black rounded-[15px] p-2 cursor-pointer'>
-                        <RiDashboardFill className='text-white text-2xl' />
-                    </div>
-                )}
+                <div onClick={() => navigate("/dashboard")} className='bg-black rounded-[15px] p-2 cursor-pointer'>
+                    <RiDashboardFill className='text-white text-2xl' />
+                </div>
                 <div className='bg-black rounded-[15px] p-2 cursor-pointer'>
                     <FaBell className='text-white text-2xl' />
                 </div>
