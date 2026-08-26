@@ -47,6 +47,16 @@ const validateUserApprovalStatus = (user) => {
     }
 };
 
+const getCookieOptions = () => {
+    const isProduction = config.nodeEnv === 'production';
+    return {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction ? true : false
+    };
+};
+
 const login = async (req, res, next) => {
 
     try {
@@ -74,12 +84,7 @@ const login = async (req, res, next) => {
             expiresIn: '1d'
         })
 
-        res.cookie('accessToken', accessToken, {
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            httpOnly: true,
-            sameSite: 'none',
-            secure: true
-        })
+        res.cookie('accessToken', accessToken, getCookieOptions())
 
         res.status(200).json({
             success: true, message: "User login successfully",
@@ -162,12 +167,7 @@ const verifyOtp = async (req, res, next) => {
             }
         );
 
-        res.cookie("accessToken", accessToken, {
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-        });
+        res.cookie("accessToken", accessToken, getCookieOptions());
 
         res.status(200).json({
             success: true,
@@ -193,11 +193,7 @@ const getUserData = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        res.clearCookie("accessToken", {
-            httpOnly: true,
-            sameSite: "none",
-            secure: true
-        });
+        res.clearCookie("accessToken", getCookieOptions());
 
         res.status(200).json({
             success: true,
