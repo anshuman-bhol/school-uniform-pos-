@@ -1,5 +1,24 @@
 const XLSX = require("xlsx");
 
+const normalizeHeader = (header) =>
+    String(header || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const getCellValue = (row, aliases) => {
+    const normalizedRow = Object.entries(row).reduce((values, [key, value]) => {
+        values[normalizeHeader(key)] = value;
+        return values;
+    }, {});
+
+    for (const alias of aliases) {
+        const value = normalizedRow[alias];
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+            return value;
+        }
+    }
+
+    return "";
+};
+
 const parseCatalogueExcel = (filePath) => {
 
     const workbook = XLSX.readFile(filePath);
@@ -10,25 +29,48 @@ const parseCatalogueExcel = (filePath) => {
 
     const rows = XLSX.utils.sheet_to_json(sheet);
 
-    return rows.map(row => ({
+    const parsedRows = [];
+    const errors = [];
 
-        category: String(row.category || "").trim(),
+    rows.forEach((row, index) => {
+        const category = String(getCellValue(row, ["category", "categoryname"]) || "").trim();
+        const productName = String(getCellValue(row, ["product", "productname", "item", "itemname"]) || "").trim();
+        const itemType = String(getCellValue(row, ["itemtype", "type"]) || "ReadyMade").trim();
+        const school = String(getCellValue(row, ["school", "schoolname"]) || "").trim();
+        const gender = String(getCellValue(row, ["gender"]) || "Unisex").trim();
+        const size = String(getCellValue(row, ["size", "sizes"]) || "").trim();
+        const colour = String(getCellValue(row, ["colour", "color"]) || "").trim();
+        const rawPrice = getCellValue(row, ["price", "sellingprice", "sellingpricers", "sellingpriceinrs", "amount"]);
+        const price = Number(rawPrice);
+        const missingFields = [];
 
-        productName: String(row.product || "").trim(),
+        if (!category) missingFields.push("category");
+        if (!productName) missingFields.push("product");
+        if (!size) missingFields.push("size");
+        if (rawPrice === "" || !Number.isFinite(price)) missingFields.push("price");
 
-        itemType: String(row.itemType || "ReadyMade").trim(),
+        if (missingFields.length) {
+            errors.push(`row ${index + 2}: missing or invalid ${missingFields.join(", ")}`);
+            return;
+        }
 
-        school: String(row.school || "").trim(),
+        parsedRows.push({
+            category,
+            productName,
+            itemType,
+            school,
+            gender,
+            size,
+            colour,
+            price,
+        });
+    });
 
-        gender: String(row.gender || "Unisex").trim(),
+    if (errors.length) {
+        throw new Error(`Invalid catalogue data: ${errors.slice(0, 5).join("; ")}`);
+    }
 
-        size: String(row.size || "").trim(),
-
-        colour: String(row.colour || "").trim(),
-
-        price: Number(row.price),
-
-    }));
+    return parsedRows;
 
 };
 
