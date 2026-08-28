@@ -1,5 +1,4 @@
 const XLSX = require("xlsx");
-const fs = require("fs");
 const Product = require("../models/productModel");
 const StockHistory = require("../models/stockHistoryModel");
 const { parseCatalogueExcel, } = require("../helpers/catalogueHelper");
@@ -12,7 +11,7 @@ const uploadCatalogue = async (req, res) => {
                 message: "Excel file required",
             });
         }
-        const rows = parseCatalogueExcel(req.file.path);
+        const rows = parseCatalogueExcel(req.file.buffer);
         const productData = {};
         rows.forEach((row) => {
             const { category, productName, itemType, school, gender, size, colour, price, } = row;
@@ -234,8 +233,6 @@ const uploadCatalogue = async (req, res) => {
 
         }
 
-        fs.unlinkSync(req.file.path);
-
         return res.status(200).json({
             success: true,
             message: "Catalogue uploaded successfully",
@@ -244,10 +241,6 @@ const uploadCatalogue = async (req, res) => {
     } catch (error) {
 
         console.log(error);
-
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
 
         return res.status(500).json({
             success: false,
@@ -265,7 +258,7 @@ const addProducts = async (req, res) => {
                 message: "Excel file required",
             });
         }
-        const rows = parseCatalogueExcel(req.file.path);
+        const rows = parseCatalogueExcel(req.file.buffer);
         for (const row of rows) {
             const { category, productName, itemType, school, gender, size, colour, price, } = row;
 
@@ -314,16 +307,12 @@ const addProducts = async (req, res) => {
             }
             await categoryDoc.save();
         }
-        fs.unlinkSync(req.file.path);
         return res.status(200).json({
             success: true,
             message: "Products merged successfully",
         });
     } catch (error) {
         console.log(error);
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
         return res.status(500).json({
             success: false,
             message: error.message,
@@ -340,7 +329,7 @@ const uploadStock = async (req, res) => {
             });
         }
 
-        const workbook = XLSX.readFile(req.file.path);
+        const workbook = XLSX.read(req.file.buffer);
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json(sheet);
@@ -400,7 +389,6 @@ const uploadStock = async (req, res) => {
                 remarks: "Bulk Stock Upload",
             });
         }
-        fs.unlinkSync(req.file.path);
         return res.status(200).json({
             success: true,
             message: "Stock file read successfully",

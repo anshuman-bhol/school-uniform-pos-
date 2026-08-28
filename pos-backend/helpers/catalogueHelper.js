@@ -19,9 +19,9 @@ const getCellValue = (row, aliases) => {
     return "";
 };
 
-const parseCatalogueExcel = (filePath) => {
+const parseCatalogueExcel = (fileBuffer) => {
 
-    const workbook = XLSX.readFile(filePath);
+    const workbook = XLSX.read(fileBuffer);
 
     const sheetName = workbook.SheetNames[0];
 
