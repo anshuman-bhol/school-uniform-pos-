@@ -138,7 +138,6 @@ const ProductContainer = () => {
         <>
             <div className="h-full flex flex-col">
                 {/* Schools */}
-
                 <div className="flex px-10 pt-1 gap-4 flex-wrap ">
                     {schools.map((school) => (
                         <div key={school} onClick={() => { setSelectedSchool(school); setSelectedCategory(""); }} className="bg-[#1a1a1a] rounded-lg p-4 cursor-pointer ">
@@ -168,7 +167,6 @@ const ProductContainer = () => {
                 <hr className="border-[#2a2a2a] my-3" />
 
                 {/* Products */}
-
                 <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none">
                     <div className="grid grid-cols-2 gap-5 px-10 pb-4">
                         {products.map((item) => {
@@ -184,7 +182,7 @@ const ProductContainer = () => {
                             const availableSizes = item.variants.filter(v => v.color === selectedColour);
                             const key = `${item._id}-${selected.size}-${selected.color}`;
                             return (
-                                <div key={item._id} className="bg-[#1a1a1a] rounded-lg p-5">
+                                <div key={item._id} className="bg-[#1a1a1a] rounded-lg p-5 min-w-0">
                                     <div className="flex justify-between">
                                         <h2 className="text-white text-lg font-bold">{item.name}</h2>
                                         <p className="text-gray-400 text-lg font-medium pt-0.5">{item.gender}</p>
@@ -233,7 +231,7 @@ const ProductContainer = () => {
                                     {/* Colour */}
                                     <div className="mt-2">
                                         <p className="text-gray-400 font-semibold mb-2">Colour</p>
-                                        <span className="flex gap-2">
+                                        <span className="flex flex-wrap gap-2 min-w-0">
                                             {colours.map((colour) => (
                                                 <button key={colour} onClick={() => {
                                                     const firstVariant = item.variants.find(v => v.color === colour);
@@ -244,7 +242,7 @@ const ProductContainer = () => {
                                                         },
                                                     });
                                                 }}
-                                                    className={`px-3 py-1 rounded font-medium ${selectedColour === colour
+                                                    className={`px-3 py-1 rounded font-medium whitespace-nowrap ${selectedColour === colour
                                                         ? "bg-blue-500 text-white"
                                                         : "bg-[#333] text-white"
                                                         }`}
